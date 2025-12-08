@@ -2,5 +2,5 @@ package com.yourcompany.recipecomposeapp
 
 enum class ScreenId {
     CATEGORIES,
-    FAVORITE,
+    FAVORITES,
 }
