@@ -20,7 +20,7 @@ fun RecipesApp() {
     var currentScreen by remember { mutableStateOf(ScreenId.CATEGORIES) }
 
     val navigateToCategories = { currentScreen = ScreenId.CATEGORIES }
-    val navigateToFavorites = { currentScreen = ScreenId.FAVORITE }
+    val navigateToFavorites = { currentScreen = ScreenId.FAVORITES }
 
     RecipeComposeAppTheme {
         Scaffold(
@@ -28,6 +28,7 @@ fun RecipesApp() {
                 BottomNavigation(
                     onCategoriesClick = navigateToCategories,
                     onFavoriteClick = navigateToFavorites,
+                    currentScreen = currentScreen
                 )
             },
             content = { paddingValues ->
@@ -49,7 +50,7 @@ fun RecipesApp() {
                             }
                         }
 
-                        ScreenId.FAVORITE -> {
+                        ScreenId.FAVORITES -> {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center

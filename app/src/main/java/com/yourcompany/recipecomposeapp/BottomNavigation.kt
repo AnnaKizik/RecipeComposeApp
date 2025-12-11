@@ -8,20 +8,21 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun BottomNavigation(
+    currentScreen: ScreenId,
     onCategoriesClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NavigationBar(modifier = modifier) {
         NavigationBarItem(
-            selected = false,
+            selected = currentScreen == ScreenId.CATEGORIES,
             onClick = onCategoriesClick,
-            icon = {},
             label = { Text("Категории") },
+            icon = {},
         )
 
         NavigationBarItem(
-            selected = false,
+            selected = currentScreen == ScreenId.FAVORITES,
             onClick = onFavoriteClick,
             icon = {},
             label = { Text("Избранное") }
