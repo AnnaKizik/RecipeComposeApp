@@ -20,15 +20,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yourcompany.recipecomposeapp.R
-import com.yourcompany.recipecomposeapp.ui.ScreenHeader
+import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 
 @Composable
-fun CategoriesScreen() {
+fun CategoriesScreen(
+    modifier: Modifier = Modifier
+) {
     Scaffold(
-        modifier = Modifier,
+        modifier = modifier,
         content = { paddingValues ->
-            Column(modifier = Modifier.padding(paddingValues)) {
+            Column(modifier = modifier.padding(paddingValues)) {
                 ScreenHeader(
                     "КАТЕГОРИИ",
                     R.drawable.bcg_categories
@@ -40,24 +42,25 @@ fun CategoriesScreen() {
 }
 
 @Composable
-fun CategoriesList() {
+fun CategoriesList(
+    modifier: Modifier = Modifier
+) {
     LazyVerticalGrid(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(6) {
             Surface(
-                modifier = Modifier
+                modifier = modifier
                     .padding(16.dp),
                 shape = RoundedCornerShape(8.dp),
                 color = MaterialTheme.colorScheme.surface,
-
-                ) {
+            ) {
                 Column {
                     Image(
-                        modifier = Modifier
+                        modifier = modifier
                             .fillMaxSize()
                             .height(130.dp),
                         painter = painterResource(R.drawable.stub),
@@ -66,13 +69,13 @@ fun CategoriesList() {
                     )
                     Text(
                         text = "Название",
-                        modifier = Modifier.padding(8.dp),
+                        modifier = modifier.padding(8.dp),
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
                         text = "Описание категории",
-                        modifier = Modifier
+                        modifier = modifier
                             .padding(horizontal = 8.dp)
                             .padding(bottom = 10.dp),
                         color = MaterialTheme.colorScheme.secondary,
