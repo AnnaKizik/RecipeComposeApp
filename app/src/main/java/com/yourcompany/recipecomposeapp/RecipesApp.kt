@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.yourcompany.recipecomposeapp.ui.categories.CategoriesScreen
 import com.yourcompany.recipecomposeapp.ui.favorites.FavoritesScreen
+import com.yourcompany.recipecomposeapp.ui.recipes.RecipesScreen
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 
 @Composable
@@ -46,6 +47,10 @@ fun RecipesApp() {
 
                         ScreenId.FAVORITES -> {
                             FavoritesScreen(isFavoritesListEmpty = false)
+                        }
+
+                        ScreenId.RECIPES -> {
+                            RecipesScreen()
                         }
                     }
                 }
