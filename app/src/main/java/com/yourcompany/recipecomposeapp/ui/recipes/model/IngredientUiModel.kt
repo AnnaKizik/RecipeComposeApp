@@ -11,5 +11,5 @@ data class IngredientUiModel(
 
 fun IngredientDto.toUiModel() = IngredientUiModel(
     name = description,
-    amount = quantity + "" + unitOfMeasure
+    amount = "$quantity $unitOfMeasure"
 )
