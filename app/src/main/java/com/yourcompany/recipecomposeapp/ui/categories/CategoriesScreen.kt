@@ -35,8 +35,9 @@ fun CategoriesScreen(
                     R.drawable.bcg_categories
                 )
                 CategoriesList(
-                    onCategoryClick = {categoryId ->
-                        RecipesRepositoryStub.getRecipesByCategoryId(categoryId)}
+                    onCategoryClick = { categoryId ->
+                        RecipesRepositoryStub.getRecipesByCategoryId(categoryId)
+                    }
                 )
             }
         }
@@ -53,48 +54,19 @@ fun CategoriesList(
     }
     val categoriesUiModelList = categoriesList.map { it.toUiModel() }
     LazyVerticalGrid(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
         columns = GridCells.Fixed(2),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(categoriesUiModelList) {category ->
+        items(categoriesUiModelList) { category ->
             CategoryItem(
                 imageUrl = category.imageUrl,
                 title = category.title,
                 description = category.description
             ){}
-//            Surface(
-//                modifier = modifier
-//                    .padding(16.dp),
-//                shape = RoundedCornerShape(8.dp),
-//                color = MaterialTheme.colorScheme.surface,
-//            ) {
-//                Column {
-//                    Image(
-//                        modifier = modifier
-//                            .fillMaxSize()
-//                            .height(130.dp),
-//                        painter = painterResource(R.drawable.stub),
-//                        contentDescription = null,
-//                        contentScale = ContentScale.Crop
-//                    )
-//                    Text(
-//                        text = "Название",
-//                        modifier = modifier.padding(8.dp),
-//                        color = MaterialTheme.colorScheme.primary,
-//                        style = MaterialTheme.typography.titleMedium
-//                    )
-//                    Text(
-//                        text = "Описание категории",
-//                        modifier = modifier
-//                            .padding(horizontal = 8.dp)
-//                            .padding(bottom = 10.dp),
-//                        color = MaterialTheme.colorScheme.secondary,
-//                        style = MaterialTheme.typography.bodySmall
-//                    )
-//                }
-//            }
         }
     }
 }

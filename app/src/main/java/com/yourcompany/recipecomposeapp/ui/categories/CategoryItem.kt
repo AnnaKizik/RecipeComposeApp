@@ -2,15 +2,14 @@ package com.yourcompany.recipecomposeapp.ui.categories
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,15 +33,16 @@ fun CategoryItem(
             modifier = modifier.background(color = MaterialTheme.colorScheme.surface)
         ) {
             AsyncImage(
-                modifier = modifier
-                    .height(130.dp),
+                modifier = modifier.height(130.dp),
                 model = imageUrl,
                 placeholder = painterResource(R.drawable.img_placeholder),
                 error = painterResource(R.drawable.img_error),
+                contentScale = ContentScale.Crop,
                 contentDescription = "Изображение категории",
+
             )
             Text(
-                text = title,
+                text = title.uppercase(),
                 modifier = modifier.padding(8.dp),
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.titleMedium
