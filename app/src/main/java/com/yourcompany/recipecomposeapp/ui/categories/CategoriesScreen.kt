@@ -61,12 +61,15 @@ fun CategoriesList(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(categoriesUiModelList) { category ->
+        items(
+            categoriesUiModelList,
+            key = { it.id }) { category ->
             CategoryItem(
                 imageUrl = category.imageUrl,
                 title = category.title,
-                description = category.description
-            ){}
+                description = category.description,
+                onClick = { onCategoryClick(category.id) }
+            )
         }
     }
 }

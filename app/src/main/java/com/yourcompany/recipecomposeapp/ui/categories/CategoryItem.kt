@@ -40,7 +40,7 @@ fun CategoryItem(
                 contentScale = ContentScale.Crop,
                 contentDescription = "Изображение категории",
 
-            )
+                )
             Text(
                 text = title.uppercase(),
                 modifier = modifier.padding(8.dp),
@@ -52,7 +52,7 @@ fun CategoryItem(
                 modifier = modifier
                     .padding(horizontal = 8.dp)
                     .padding(bottom = 10.dp),
-                color = MaterialTheme.colorScheme.secondary,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodySmall
             )
         }
