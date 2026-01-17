@@ -9,13 +9,12 @@ data class CategoryUiModel(
     val id: Int,
     val title: String,
     val description: String,
-    val imageUrl: String
+    val imageUrl: String,
 )
 
 fun CategoryDto.toUiModel() = CategoryUiModel(
     id = id,
     title = title,
     description = description,
-    imageUrl = if (imageUrl.startsWith("http")) imageUrl
-    else Constants.ASSETS_URI_PREFIX + imageUrl
+    imageUrl = if (imageUrl.startsWith("http")) imageUrl else Constants.ASSETS_URI_PREFIX + imageUrl
 )
