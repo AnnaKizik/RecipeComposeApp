@@ -25,7 +25,7 @@ import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 @Composable
 fun CategoriesScreen(
     modifier: Modifier = Modifier,
-    onCategoryClick: (Int) -> Unit,
+    onCategoryClick: (Int, String) -> Unit,
 ) {
     Scaffold(
         modifier = modifier,
@@ -36,8 +36,8 @@ fun CategoriesScreen(
                     R.drawable.bcg_categories
                 )
                 CategoriesList(
-                    onCategoryClick = { categoryId ->
-                        onCategoryClick(categoryId)
+                    onCategoryClick = { categoryId, categoryTitle ->
+                        onCategoryClick(categoryId, categoryTitle)
                     }
                 )
             }
@@ -48,7 +48,7 @@ fun CategoriesScreen(
 @Composable
 fun CategoriesList(
     modifier: Modifier = Modifier,
-    onCategoryClick: (Int) -> Unit,
+    onCategoryClick: (Int, String) -> Unit,
 ) {
     var categoriesList by remember {
         mutableStateOf(RecipesRepositoryStub.takeCategories())
@@ -69,7 +69,7 @@ fun CategoriesList(
                 imageUrl = category.imageUrl,
                 title = category.title,
                 description = category.description,
-                onCategoryClick = { onCategoryClick(category.id) }
+                onCategoryClick = { onCategoryClick(category.id, category.title) }
             )
         }
     }
@@ -80,7 +80,7 @@ fun CategoriesList(
 fun CategoriesScreenPreview() {
     RecipeComposeAppTheme {
         CategoriesScreen(
-            onCategoryClick = {}
+            onCategoryClick = { categoryId: Int, categoryTitle: String -> }
         )
     }
 }
