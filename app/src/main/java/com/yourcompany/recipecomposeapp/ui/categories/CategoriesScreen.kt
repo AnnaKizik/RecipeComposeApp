@@ -1,31 +1,31 @@
 package com.yourcompany.recipecomposeapp.ui.categories
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yourcompany.recipecomposeapp.R
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
+import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub
+import com.yourcompany.recipecomposeapp.ui.categories.model.toUiModel
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 
 @Composable
 fun CategoriesScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCategoryClick: (Int) -> Unit,
 ) {
     Scaffold(
         modifier = modifier,
@@ -35,7 +35,11 @@ fun CategoriesScreen(
                     "КАТЕГОРИИ",
                     R.drawable.bcg_categories
                 )
-                CategoriesList()
+                CategoriesList(
+                    onCategoryClick = { categoryId ->
+                        onCategoryClick(categoryId)
+                    }
+                )
             }
         }
     )
@@ -43,46 +47,30 @@ fun CategoriesScreen(
 
 @Composable
 fun CategoriesList(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCategoryClick: (Int) -> Unit,
 ) {
+    var categoriesList by remember {
+        mutableStateOf(RecipesRepositoryStub.takeCategories())
+    }
+    val categoriesUiModelList = categoriesList.map { it.toUiModel() }
     LazyVerticalGrid(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
         columns = GridCells.Fixed(2),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(6) {
-            Surface(
-                modifier = modifier
-                    .padding(16.dp),
-                shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colorScheme.surface,
-            ) {
-                Column {
-                    Image(
-                        modifier = modifier
-                            .fillMaxSize()
-                            .height(130.dp),
-                        painter = painterResource(R.drawable.stub),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop
-                    )
-                    Text(
-                        text = "Название",
-                        modifier = modifier.padding(8.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = "Описание категории",
-                        modifier = modifier
-                            .padding(horizontal = 8.dp)
-                            .padding(bottom = 10.dp),
-                        color = MaterialTheme.colorScheme.secondary,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
+        items(
+            categoriesUiModelList,
+            key = { it.id }) { category ->
+            CategoryItem(
+                imageUrl = category.imageUrl,
+                title = category.title,
+                description = category.description,
+                onCategoryClick = { onCategoryClick(category.id) }
+            )
         }
     }
 }
@@ -91,6 +79,8 @@ fun CategoriesList(
 @Composable
 fun CategoriesScreenPreview() {
     RecipeComposeAppTheme {
-        CategoriesScreen()
+        CategoriesScreen(
+            onCategoryClick = {}
+        )
     }
 }

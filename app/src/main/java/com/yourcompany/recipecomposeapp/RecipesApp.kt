@@ -20,6 +20,8 @@ import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 @Composable
 fun RecipesApp() {
     var currentScreen by remember { mutableStateOf(ScreenId.CATEGORIES) }
+    var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
+    var selectedCategoryTitle by remember { mutableStateOf<String?>(null) }
 
     val navigateToCategories = { currentScreen = ScreenId.CATEGORIES }
     val navigateToFavorites = { currentScreen = ScreenId.FAVORITES }
@@ -42,7 +44,12 @@ fun RecipesApp() {
                 ) {
                     when (currentScreen) {
                         ScreenId.CATEGORIES -> {
-                            CategoriesScreen()
+                            CategoriesScreen(
+                                onCategoryClick = {categoryId ->
+                                    selectedCategoryId = categoryId
+                                    currentScreen = ScreenId.RECIPES
+                                }
+                            )
                         }
 
                         ScreenId.FAVORITES -> {
@@ -50,7 +57,11 @@ fun RecipesApp() {
                         }
 
                         ScreenId.RECIPES -> {
-                            RecipesScreen()
+                            RecipesScreen(
+                                categoryId = selectedCategoryId ?: error("Category ID is required"),
+                                categoryTitle = selectedCategoryTitle ?: error("Category Title is required"),
+                                onRecipeClick = {}
+                            )
                         }
                     }
                 }
