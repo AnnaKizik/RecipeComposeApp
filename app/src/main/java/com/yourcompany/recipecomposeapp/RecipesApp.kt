@@ -45,9 +45,9 @@ fun RecipesApp() {
                     when (currentScreen) {
                         ScreenId.CATEGORIES -> {
                             CategoriesScreen(
-                                onCategoryClick = { categoryId, categotyTitle ->
+                                onCategoryClick = { categoryId, categoryTitle ->
                                     selectedCategoryId = categoryId
-                                    selectedCategoryTitle = categotyTitle
+                                    selectedCategoryTitle = categoryTitle
                                     currentScreen = ScreenId.RECIPES
                                 }
                             )
@@ -58,12 +58,13 @@ fun RecipesApp() {
                         }
 
                         ScreenId.RECIPES -> {
-                            RecipesScreen(
-                                categoryId = selectedCategoryId ?: error("Category ID is required"),
-                                categoryTitle = selectedCategoryTitle
-                                    ?: error("Category Title is required"),
-                                onRecipeClick = {}
-                            )
+                            if (selectedCategoryId != null) {
+                                RecipesScreen(
+                                    categoryId = selectedCategoryId,
+                                    categoryTitle = selectedCategoryTitle ?: "Категория",
+                                    onRecipeClick = {}
+                                )
+                            }
                         }
                     }
                 }

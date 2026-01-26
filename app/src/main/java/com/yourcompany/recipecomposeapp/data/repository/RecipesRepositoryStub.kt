@@ -46,7 +46,8 @@ object RecipesRepositoryStub {
 
     val recipes = listOf(
         RecipeDto(
-            id = 0,
+            recipeId = 0,
+            categoryId = 0,
             title = "Классический бургер с говядиной",
             ingredients = listOf(
                 IngredientDto(
@@ -109,6 +110,6 @@ object RecipesRepositoryStub {
     fun takeCategories() = categories
 
     fun getRecipesByCategoryId(categoryId: Int?): List<RecipeDto> {
-        return recipes.filter { it.id == categoryId}
+        return recipes.filter { it.categoryId == categoryId }
     }
 }

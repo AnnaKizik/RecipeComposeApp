@@ -1,7 +1,8 @@
 package com.yourcompany.recipecomposeapp.data.model
 
 data class RecipeDto(
-    val id: Int,
+    val recipeId: Int,
+    val categoryId: Int,
     val title: String,
     val ingredients: List<IngredientDto>,
     val method: List<String>,
