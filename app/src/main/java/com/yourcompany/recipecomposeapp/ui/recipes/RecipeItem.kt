@@ -1,4 +1,4 @@
-package com.yourcompany.recipecomposeapp.ui.categories
+package com.yourcompany.recipecomposeapp.ui.recipes
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -15,45 +15,39 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.yourcompany.recipecomposeapp.R
+import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub
+import com.yourcompany.recipecomposeapp.ui.recipes.model.RecipeUiModel
+import com.yourcompany.recipecomposeapp.ui.recipes.model.toUiModel
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
+import kotlin.Int
 
 @Composable
-fun CategoryItem(
+fun RecipeItem(
+    recipe: RecipeUiModel,
+    onRecipeClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    imageUrl: String,
-    title: String,
-    description: String,
-    onCategoryClick: () -> Unit,
 ) {
     Card(
-        onClick = onCategoryClick,
         modifier = modifier,
+        onClick = { onRecipeClick(recipe.id) }
     ) {
         Column(
-            modifier = modifier.background(color = MaterialTheme.colorScheme.surface)
+            modifier = Modifier.background(color = MaterialTheme.colorScheme.surface)
         ) {
             AsyncImage(
-                modifier = Modifier.height(130.dp),
-                model = imageUrl,
+                modifier = Modifier
+                    .height(100.dp),
+                model = recipe.imageUrl,
                 placeholder = painterResource(R.drawable.img_placeholder),
                 error = painterResource(R.drawable.img_error),
                 contentScale = ContentScale.Crop,
-                contentDescription = "Изображение категории",
-
-                )
-            Text(
-                text = title.uppercase(),
-                modifier = Modifier.padding(8.dp),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleMedium
+                contentDescription = "Изображение рецепта",
             )
             Text(
-                text = description,
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .padding(bottom = 10.dp),
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.bodySmall
+                modifier = Modifier.padding(8.dp),
+                text = recipe.title.uppercase(),
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.titleMedium
             )
         }
     }
@@ -61,13 +55,11 @@ fun CategoryItem(
 
 @Preview(showBackground = true)
 @Composable
-fun CategoryItemPreview() {
+fun RecipeItemPreview() {
     RecipeComposeAppTheme {
-        CategoryItem(
-            imageUrl = "burger.png",
-            title = "ЗАГОЛОВОК",
-            description = "Описание категории",
-            onCategoryClick = {},
+        RecipeItem(
+            recipe = RecipesRepositoryStub.recipes[0].toUiModel(),
+            onRecipeClick = {}
         )
     }
 }

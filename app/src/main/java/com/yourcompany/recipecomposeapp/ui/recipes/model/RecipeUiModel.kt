@@ -15,7 +15,7 @@ data class RecipeUiModel(
 )
 
 fun RecipeDto.toUiModel() = RecipeUiModel(
-    id = id,
+    id = recipeId,
     title = title,
     imageUrl = if (imageUrl.startsWith("http")) imageUrl
     else Constants.ASSETS_URI_PREFIX + imageUrl,

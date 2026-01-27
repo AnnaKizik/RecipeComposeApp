@@ -1,47 +1,62 @@
 package com.yourcompany.recipecomposeapp.ui.recipes
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yourcompany.recipecomposeapp.R
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
+import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub.getRecipesByCategoryId
+import com.yourcompany.recipecomposeapp.ui.recipes.model.RecipeUiModel
+import com.yourcompany.recipecomposeapp.ui.recipes.model.toUiModel
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 
 @Composable
 fun RecipesScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    categoryId: Int?,
+    categoryTitle: String,
+    onRecipeClick: (Int) -> Unit,
 ) {
+    var recipes by remember { mutableStateOf<List<RecipeUiModel>>(emptyList()) }
+
+    LaunchedEffect(categoryId) {
+        categoryId?.let {
+            recipes = getRecipesByCategoryId(it).map { dto -> dto.toUiModel() }
+        }
+    }
+
     Scaffold(
         modifier = modifier,
         content = { paddingValues ->
-            Column(modifier = Modifier.padding(paddingValues)) {
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+            ) {
                 ScreenHeader(
-                    screenTitle = "РЕЦЕПТЫ",
+                    screenTitle = categoryTitle.uppercase(),
                     screenCover = R.drawable.stub
                 )
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    contentAlignment = Alignment.Center
+                LazyColumn(
                 ) {
-                    Text(
-                        modifier = Modifier,
-                        text = "Скоро здесь будет список рецептов",
-                        color = MaterialTheme.colorScheme.secondary,
-                        style = MaterialTheme.typography.labelLarge,
-                        textAlign = TextAlign.Center,
-                    )
+                    items(recipes, key = { it.id }) { recipe ->
+                        RecipeItem(
+                            recipe = recipe,
+                            onRecipeClick = { onRecipeClick(recipe.id) },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                    }
                 }
             }
         }
@@ -52,6 +67,10 @@ fun RecipesScreen(
 @Composable
 fun RecipesScreenPreview() {
     RecipeComposeAppTheme {
-        RecipesScreen()
+        RecipesScreen(
+            categoryId = 0,
+            categoryTitle = "Бургеры",
+            onRecipeClick = {}
+        )
     }
 }
