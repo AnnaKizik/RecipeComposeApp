@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yourcompany.recipecomposeapp.R
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
+import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub
 import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub.getRecipesByCategoryId
 import com.yourcompany.recipecomposeapp.ui.recipes.model.RecipeUiModel
 import com.yourcompany.recipecomposeapp.ui.recipes.model.toUiModel
@@ -25,7 +26,6 @@ import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 fun RecipesScreen(
     modifier: Modifier = Modifier,
     categoryId: Int?,
-    categoryTitle: String,
     onRecipeClick: (Int) -> Unit,
 ) {
     var recipes by remember { mutableStateOf<List<RecipeUiModel>>(emptyList()) }
@@ -44,11 +44,10 @@ fun RecipesScreen(
                     .padding(paddingValues)
             ) {
                 ScreenHeader(
-                    screenTitle = categoryTitle.uppercase(),
+                    screenTitle = RecipesRepositoryStub.categories.find { it.id == categoryId }?.title?.uppercase() ?: "Категория",
                     screenCover = R.drawable.stub
                 )
-                LazyColumn(
-                ) {
+                LazyColumn{
                     items(recipes, key = { it.id }) { recipe ->
                         RecipeItem(
                             recipe = recipe,
@@ -69,7 +68,6 @@ fun RecipesScreenPreview() {
     RecipeComposeAppTheme {
         RecipesScreen(
             categoryId = 0,
-            categoryTitle = "Бургеры",
             onRecipeClick = {}
         )
     }
