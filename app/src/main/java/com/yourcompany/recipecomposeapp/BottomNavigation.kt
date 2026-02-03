@@ -13,6 +13,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,23 +21,29 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 
 @Composable
 fun BottomNavigation(
-    currentScreen: ScreenId,
-    onCategoriesClick: () -> Unit,
-    onFavoriteClick: () -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier,
 ) {
+    val currentBackStack by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStack?.destination?.route
     NavigationBar(
         modifier = modifier
             .padding(horizontal = 16.dp),
         containerColor = Color.Transparent
     ) {
         NavigationBarItem(
-            selected = currentScreen == ScreenId.CATEGORIES,
-            onClick = onCategoriesClick,
+            selected = currentRoute == Destination.Categories.route,
+            onClick = {
+                if (currentRoute != Destination.Categories.route)
+                    navController.navigate(Destination.Categories.route)
+            },
             label = {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -58,8 +65,11 @@ fun BottomNavigation(
             )
         )
         NavigationBarItem(
-            selected = currentScreen == ScreenId.FAVORITES,
-            onClick = onFavoriteClick,
+            selected = currentRoute == Destination.Favorites.route,
+            onClick = {
+                if (currentRoute != Destination.Favorites.route)
+                    navController.navigate(Destination.Favorites.route)
+            },
             icon = {},
             label = {
                 Surface(
@@ -101,6 +111,7 @@ fun BottomNavigation(
 @Composable
 fun BottomNavigationPreview() {
     RecipeComposeAppTheme {
-        BottomNavigation(ScreenId.CATEGORIES, {}, {})
+        val navController = rememberNavController()
+        BottomNavigation(navController = navController)
     }
 }

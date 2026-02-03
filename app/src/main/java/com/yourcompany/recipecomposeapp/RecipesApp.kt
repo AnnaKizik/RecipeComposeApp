@@ -1,75 +1,79 @@
 package com.yourcompany.recipecomposeapp
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.yourcompany.recipecomposeapp.ui.categories.CategoriesScreen
 import com.yourcompany.recipecomposeapp.ui.favorites.FavoritesScreen
+import com.yourcompany.recipecomposeapp.ui.recipe.RecipeScreen
 import com.yourcompany.recipecomposeapp.ui.recipes.RecipesScreen
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 
 @Composable
 fun RecipesApp() {
-    var currentScreen by remember { mutableStateOf(ScreenId.CATEGORIES) }
-    var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
-    var selectedCategoryTitle by remember { mutableStateOf<String?>("Title") }
-
-    val navigateToCategories = { currentScreen = ScreenId.CATEGORIES }
-    val navigateToFavorites = { currentScreen = ScreenId.FAVORITES }
+    val navController = rememberNavController()
 
     RecipeComposeAppTheme {
         Scaffold(
             bottomBar = {
                 BottomNavigation(
-                    onCategoriesClick = navigateToCategories,
-                    onFavoriteClick = navigateToFavorites,
-                    currentScreen = currentScreen
+                    navController = navController
                 )
-            },
-            content = { paddingValues ->
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    when (currentScreen) {
-                        ScreenId.CATEGORIES -> {
-                            CategoriesScreen(
-                                onCategoryClick = { categoryId, categoryTitle ->
-                                    selectedCategoryId = categoryId
-                                    selectedCategoryTitle = categoryTitle
-                                    currentScreen = ScreenId.RECIPES
-                                }
-                            )
+            }
+        ) { paddingValues ->
+            NavHost(
+                navController = navController,
+                startDestination = Destination.Categories.route,
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                composable(Destination.Categories.route) {
+                    CategoriesScreen(
+                        onCategoryClick = { categoryId ->
+                            navController.navigate(Destination.Recipes.createRoute(categoryId))
                         }
-
-                        ScreenId.FAVORITES -> {
-                            FavoritesScreen(isFavoritesListEmpty = false)
-                        }
-
-                        ScreenId.RECIPES -> {
-                            if (selectedCategoryId != null) {
-                                RecipesScreen(
-                                    categoryId = selectedCategoryId,
-                                    categoryTitle = selectedCategoryTitle ?: "Категория",
-                                    onRecipeClick = {}
-                                )
-                            }
-                        }
-                    }
+                    )
                 }
-            },
-        )
+                composable(
+                    route = Destination.Recipes.route,
+                    arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: 0
+                    RecipesScreen(
+                        categoryId = categoryId,
+                        onRecipeClick = { recipeId ->
+                            navController.navigate(Destination.Recipe.createRoute(recipeId))
+                        }
+                    )
+                }
+                composable(
+                    route = Destination.Recipe.route,
+                    arguments = listOf(navArgument("recipeId") {
+                        type = NavType.IntType
+                    })
+                ) { backStackEntry ->
+                    val recipeId = backStackEntry.arguments?.getInt("recipeId") ?: 0
+                    RecipeScreen(
+                        recipeId = recipeId
+                    )
+                }
+                composable(
+                    route = Destination.Favorites.route,
+                ) {
+                    FavoritesScreen(
+                        onRecipeClick = { recipeId ->
+                            navController.navigate(Destination.Recipe.createRoute(recipeId))
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 
