@@ -26,7 +26,7 @@ import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 fun RecipesScreen(
     modifier: Modifier = Modifier,
     categoryId: Int?,
-    onRecipeClick: (Int) -> Unit,
+    onRecipeClick: (Int, RecipeUiModel) -> Unit,
 ) {
     var recipes by remember { mutableStateOf<List<RecipeUiModel>>(emptyList()) }
 
@@ -51,7 +51,7 @@ fun RecipesScreen(
                     items(recipes, key = { it.id }) { recipe ->
                         RecipeItem(
                             recipe = recipe,
-                            onRecipeClick = { onRecipeClick(recipe.id) },
+                            onRecipeClick = { onRecipeClick(recipe.id, recipe) },
                             modifier = Modifier
                                 .padding(horizontal = 16.dp, vertical = 8.dp)
                         )
@@ -68,7 +68,7 @@ fun RecipesScreenPreview() {
     RecipeComposeAppTheme {
         RecipesScreen(
             categoryId = 0,
-            onRecipeClick = {}
+            onRecipeClick = {recipeId, recipe ->}
         )
     }
 }

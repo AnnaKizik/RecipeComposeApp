@@ -23,7 +23,7 @@ import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 @Composable
 fun ScreenHeader(
     screenTitle: String,
-    screenCover: Int
+    screenCover: Int,
 ) {
     Box(
         modifier = Modifier

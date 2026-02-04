@@ -8,6 +8,7 @@ sealed class Destination(val route: String) {
 
     object Recipe : Destination("recipe/{recipeId}") {
         fun createRoute(recipeId: Int) = "recipe/${recipeId}"
+        const val KEY_RECIPE_OBJECT = "recipeObject"
     }
 
     object Favorites : Destination("favorites")
