@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yourcompany.recipecomposeapp.R
+import com.yourcompany.recipecomposeapp.core.ui.ImageResource
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
 import com.yourcompany.recipecomposeapp.ui.recipes.RecipeItem
 import com.yourcompany.recipecomposeapp.ui.recipes.model.RecipeUiModel
@@ -39,7 +40,7 @@ fun FavoritesScreen(
             Column(modifier = modifier.padding(paddingValues)) {
                 ScreenHeader(
                     screenTitle = "ИЗБРАННОЕ",
-                    screenCover = R.drawable.bcg_favorites
+                    screenCover = ImageResource.ResourceId(R.drawable.bcg_favorites)
                 )
                 if (isFavoritesListEmpty) {
                     Box(
