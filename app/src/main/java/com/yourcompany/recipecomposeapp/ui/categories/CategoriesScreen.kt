@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yourcompany.recipecomposeapp.R
+import com.yourcompany.recipecomposeapp.core.ui.ImageResource
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
 import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub
 import com.yourcompany.recipecomposeapp.ui.categories.model.toUiModel
@@ -33,7 +34,7 @@ fun CategoriesScreen(
             Column(modifier = modifier.padding(paddingValues)) {
                 ScreenHeader(
                     "КАТЕГОРИИ",
-                    R.drawable.bcg_categories
+                    ImageResource.ResourceId(R.drawable.bcg_categories)
                 )
                 CategoriesList(
                     onCategoryClick = { categoryId ->
@@ -80,7 +81,7 @@ fun CategoriesList(
 fun CategoriesScreenPreview() {
     RecipeComposeAppTheme {
         CategoriesScreen(
-            onCategoryClick = { categoryId: Int -> }
+            onCategoryClick = { _: Int -> }
         )
     }
 }

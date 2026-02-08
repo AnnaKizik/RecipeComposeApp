@@ -15,9 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yourcompany.recipecomposeapp.R
+import com.yourcompany.recipecomposeapp.core.ui.ImageResource
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
 import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub
 import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub.getRecipesByCategoryId
+import com.yourcompany.recipecomposeapp.ui.categories.model.toUiModel
 import com.yourcompany.recipecomposeapp.ui.recipes.model.RecipeUiModel
 import com.yourcompany.recipecomposeapp.ui.recipes.model.toUiModel
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
@@ -26,9 +28,10 @@ import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 fun RecipesScreen(
     modifier: Modifier = Modifier,
     categoryId: Int?,
-    onRecipeClick: (Int) -> Unit,
+    onRecipeClick: (Int, RecipeUiModel) -> Unit,
 ) {
     var recipes by remember { mutableStateOf<List<RecipeUiModel>>(emptyList()) }
+    val category = RecipesRepositoryStub.categories.find { it.id == categoryId }?.toUiModel()
 
     LaunchedEffect(categoryId) {
         categoryId?.let {
@@ -44,14 +47,15 @@ fun RecipesScreen(
                     .padding(paddingValues)
             ) {
                 ScreenHeader(
-                    screenTitle = RecipesRepositoryStub.categories.find { it.id == categoryId }?.title?.uppercase() ?: "Категория",
-                    screenCover = R.drawable.stub
+                    screenTitle = category?.title?.uppercase() ?: "Категория",
+                    screenCover = if (category?.imageUrl != null) ImageResource.ResourceUrl(category.imageUrl)
+                    else ImageResource.ResourceId(R.drawable.stub)
                 )
-                LazyColumn{
+                LazyColumn {
                     items(recipes, key = { it.id }) { recipe ->
                         RecipeItem(
                             recipe = recipe,
-                            onRecipeClick = { onRecipeClick(recipe.id) },
+                            onRecipeClick = { onRecipeClick(recipe.id, recipe) },
                             modifier = Modifier
                                 .padding(horizontal = 16.dp, vertical = 8.dp)
                         )
@@ -68,7 +72,7 @@ fun RecipesScreenPreview() {
     RecipeComposeAppTheme {
         RecipesScreen(
             categoryId = 0,
-            onRecipeClick = {}
+            onRecipeClick = { _, _ -> }
         )
     }
 }

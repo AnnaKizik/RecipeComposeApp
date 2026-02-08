@@ -11,9 +11,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.yourcompany.recipecomposeapp.ui.categories.CategoriesScreen
+import com.yourcompany.recipecomposeapp.ui.details.RecipeDetailsScreen
 import com.yourcompany.recipecomposeapp.ui.favorites.FavoritesScreen
-import com.yourcompany.recipecomposeapp.ui.recipe.RecipeScreen
 import com.yourcompany.recipecomposeapp.ui.recipes.RecipesScreen
+import com.yourcompany.recipecomposeapp.ui.recipes.model.RecipeUiModel
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 
 @Composable
@@ -47,7 +48,11 @@ fun RecipesApp() {
                     val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: 0
                     RecipesScreen(
                         categoryId = categoryId,
-                        onRecipeClick = { recipeId ->
+                        onRecipeClick = { recipeId, recipe ->
+                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                Destination.Recipe.KEY_RECIPE_OBJECT,
+                                recipe
+                            )
                             navController.navigate(Destination.Recipe.createRoute(recipeId))
                         }
                     )
@@ -57,11 +62,12 @@ fun RecipesApp() {
                     arguments = listOf(navArgument("recipeId") {
                         type = NavType.IntType
                     })
-                ) { backStackEntry ->
-                    val recipeId = backStackEntry.arguments?.getInt("recipeId") ?: 0
-                    RecipeScreen(
-                        recipeId = recipeId
-                    )
+                ) {
+                    val recipe =
+                        navController.previousBackStackEntry?.savedStateHandle?.get<RecipeUiModel>(
+                            Destination.Recipe.KEY_RECIPE_OBJECT
+                        ) ?: throw IllegalArgumentException("Ошибка при получении рецепта")
+                    RecipeDetailsScreen(recipe)
                 }
                 composable(
                     route = Destination.Favorites.route,
