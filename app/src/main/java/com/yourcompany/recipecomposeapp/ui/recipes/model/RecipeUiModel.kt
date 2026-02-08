@@ -12,6 +12,7 @@ data class RecipeUiModel(
     val id: Int,
     val title: String,
     val imageUrl: String,
+    val servings: Int,
     val ingredients: List<IngredientUiModel>,
     val method: List<String>,
     val isFavorite: Boolean,
@@ -22,6 +23,7 @@ fun RecipeDto.toUiModel() = RecipeUiModel(
     title = title,
     imageUrl = if (imageUrl.startsWith("http")) imageUrl
     else Constants.ASSETS_URI_PREFIX + imageUrl,
+    servings = 1,
     ingredients = ingredients.map { it.toUiModel() },
     method = method,
     isFavorite = isFavorite

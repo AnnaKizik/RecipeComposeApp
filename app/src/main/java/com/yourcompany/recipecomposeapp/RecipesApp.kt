@@ -14,7 +14,6 @@ import com.yourcompany.recipecomposeapp.ui.categories.CategoriesScreen
 import com.yourcompany.recipecomposeapp.ui.details.RecipeDetailsScreen
 import com.yourcompany.recipecomposeapp.ui.favorites.FavoritesScreen
 import com.yourcompany.recipecomposeapp.ui.recipes.RecipesScreen
-import com.yourcompany.recipecomposeapp.ui.recipes.model.RecipeUiModel
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 
 @Composable
@@ -62,12 +61,9 @@ fun RecipesApp() {
                     arguments = listOf(navArgument("recipeId") {
                         type = NavType.IntType
                     })
-                ) {
-                    val recipe =
-                        navController.previousBackStackEntry?.savedStateHandle?.get<RecipeUiModel>(
-                            Destination.Recipe.KEY_RECIPE_OBJECT
-                        ) ?: throw IllegalArgumentException("Ошибка при получении рецепта")
-                    RecipeDetailsScreen(recipe)
+                ) {backStackEntry ->
+                    val recipeId = backStackEntry.arguments?.getInt("recipeId") ?: 0
+                    RecipeDetailsScreen(recipeId)
                 }
                 composable(
                     route = Destination.Favorites.route,
