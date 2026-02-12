@@ -3,6 +3,8 @@ package com.yourcompany.recipecomposeapp.data.repository
 import com.yourcompany.recipecomposeapp.data.model.CategoryDto
 import com.yourcompany.recipecomposeapp.data.model.IngredientDto
 import com.yourcompany.recipecomposeapp.data.model.RecipeDto
+import com.yourcompany.recipecomposeapp.ui.recipes.model.RecipeUiModel
+import com.yourcompany.recipecomposeapp.ui.recipes.model.toUiModel
 
 object RecipesRepositoryStub {
     val categories = listOf(
@@ -111,5 +113,10 @@ object RecipesRepositoryStub {
 
     fun getRecipesByCategoryId(categoryId: Int?): List<RecipeDto> {
         return recipes.filter { it.categoryId == categoryId }
+    }
+
+    fun getRecipeDataByRecipeId(recipeId: Int): RecipeUiModel {
+        return recipes.find { it.recipeId == recipeId }?.toUiModel()
+            ?: throw IllegalArgumentException("Рецепт с данным id не найден!")
     }
 }
