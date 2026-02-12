@@ -28,15 +28,16 @@ import androidx.compose.ui.unit.dp
 import com.yourcompany.recipecomposeapp.core.ui.ImageResource
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
 import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub
+import com.yourcompany.recipecomposeapp.ui.recipes.model.RecipeUiModel
+import com.yourcompany.recipecomposeapp.ui.recipes.model.toUiModel
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
 import kotlin.math.roundToInt
 
 @Composable
 fun RecipeDetailsScreen(
-    recipeId: Int,
+    recipe: RecipeUiModel,
     modifier: Modifier = Modifier,
 ) {
-    val recipe = RecipesRepositoryStub.getRecipeDataByRecipeId(recipeId)
     var currentPortions by remember { mutableStateOf(recipe.servings) }
 
     val scaledIngredients = remember(currentPortions) {
@@ -174,6 +175,6 @@ fun PortionsSlider(
 @Composable
 fun RecipeDetailScreenPreview() {
     RecipeComposeAppTheme {
-        RecipeDetailsScreen(0)
+        RecipeDetailsScreen(RecipesRepositoryStub.recipes[0].toUiModel())
     }
 }
