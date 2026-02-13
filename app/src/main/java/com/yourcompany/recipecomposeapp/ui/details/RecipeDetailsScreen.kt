@@ -1,7 +1,11 @@
 package com.yourcompany.recipecomposeapp.ui.details
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,14 +24,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import com.yourcompany.recipecomposeapp.R
 import com.yourcompany.recipecomposeapp.core.ui.ImageResource
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
 import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub
+import com.yourcompany.recipecomposeapp.shareRecipe
 import com.yourcompany.recipecomposeapp.ui.recipes.model.RecipeUiModel
 import com.yourcompany.recipecomposeapp.ui.recipes.model.toUiModel
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
@@ -53,6 +62,8 @@ fun RecipeDetailsScreen(
         }
     }
 
+    val context = LocalContext.current
+
     Scaffold(
         modifier = modifier,
         content = { paddingValues ->
@@ -60,9 +71,13 @@ fun RecipeDetailsScreen(
                 modifier = Modifier.padding(paddingValues)
             ) {
                 item {
-                    ScreenHeader(
-                        screenCover = ImageResource.ResourceUrl(recipe.imageUrl),
-                        screenTitle = recipe.title
+                    RecipeHeader(
+                        recipe = recipe,
+                        isFavorite = recipe.isFavorite,
+                        onToggleFavorite = {},
+                        onShareClick = {
+                            shareRecipe(context, recipe.id, recipe.title)
+                        }
                     )
                 }
                 item {
@@ -101,13 +116,13 @@ fun RecipeDetailsScreen(
                 items(recipe.method) { step ->
                     Surface(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        shape = when {
-                            step == recipe.method.first() -> RoundedCornerShape(
+                        shape = when (step) {
+                            recipe.method.first() -> RoundedCornerShape(
                                 topStart = 8.dp,
                                 topEnd = 8.dp
                             )
 
-                            step == recipe.method.last() -> RoundedCornerShape(
+                            recipe.method.last() -> RoundedCornerShape(
                                 bottomStart = 8.dp,
                                 bottomEnd = 8.dp
                             )
@@ -169,6 +184,46 @@ fun PortionsSlider(
         },
         enabled = true
     )
+}
+
+@Composable
+fun RecipeHeader(
+    recipe: RecipeUiModel,
+    isFavorite: Boolean,
+    onToggleFavorite: () -> Unit,
+    onShareClick: () -> Unit,
+) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        ScreenHeader(
+            screenTitle = recipe.title,
+            screenCover = ImageResource.ResourceUrl(recipe.imageUrl)
+        )
+        Image(
+            modifier = Modifier
+                .padding(top = 16.dp, end = 16.dp)
+                .align(Alignment.TopEnd)
+                .clickable(
+                    true,
+                    onClick = onToggleFavorite
+                ),
+            painter = if (isFavorite) painterResource(R.drawable.ic_heart)
+            else painterResource(R.drawable.ic_heart_empty_btn),
+            contentDescription = null,
+        )
+        Text(
+            modifier = Modifier
+                .clickable(
+                    onClick = onShareClick
+                )
+                .align(Alignment.TopStart)
+                .padding(start = 16.dp, top = 16.dp),
+            text = "Поделиться",
+            color = MaterialTheme.colorScheme.surface,
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
 }
 
 @Preview(showBackground = true)
