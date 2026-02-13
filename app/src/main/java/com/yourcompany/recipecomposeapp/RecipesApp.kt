@@ -1,8 +1,10 @@
 package com.yourcompany.recipecomposeapp
 
+import android.content.Intent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavType
@@ -10,15 +12,36 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub
 import com.yourcompany.recipecomposeapp.ui.categories.CategoriesScreen
 import com.yourcompany.recipecomposeapp.ui.details.RecipeDetailsScreen
 import com.yourcompany.recipecomposeapp.ui.favorites.FavoritesScreen
 import com.yourcompany.recipecomposeapp.ui.recipes.RecipesScreen
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
+import kotlinx.coroutines.delay
 
 @Composable
-fun RecipesApp() {
+fun RecipesApp(deepLinkIntent: Intent?) {
     val navController = rememberNavController()
+
+    LaunchedEffect(deepLinkIntent) {
+        deepLinkIntent?.data?.let { uri ->
+            val recipeId: Int? = when (uri.scheme) {
+                "recipeapp" ->
+                    if (uri.host == "recipe") uri.pathSegments[0].toIntOrNull() else null
+
+                "https", "http" ->
+                    if (uri.pathSegments[0] == "recipe") uri.pathSegments[1].toIntOrNull() else null
+
+                else -> null
+            }
+
+            if (recipeId != null) {
+                delay(100)
+                navController.navigate(Destination.Recipe.createRoute(recipeId))
+            }
+        }
+    }
 
     RecipeComposeAppTheme {
         Scaffold(
@@ -61,9 +84,10 @@ fun RecipesApp() {
                     arguments = listOf(navArgument("recipeId") {
                         type = NavType.IntType
                     })
-                ) {backStackEntry ->
+                ) { backStackEntry ->
                     val recipeId = backStackEntry.arguments?.getInt("recipeId") ?: 0
-                    RecipeDetailsScreen(recipeId)
+                    val recipe = RecipesRepositoryStub.getRecipeDataByRecipeId(recipeId)
+                    RecipeDetailsScreen(recipe = recipe)
                 }
                 composable(
                     route = Destination.Favorites.route,
@@ -82,5 +106,5 @@ fun RecipesApp() {
 @Preview(showBackground = true)
 @Composable
 fun RecipesAppPreview() {
-    RecipesApp()
+    RecipesApp(null)
 }

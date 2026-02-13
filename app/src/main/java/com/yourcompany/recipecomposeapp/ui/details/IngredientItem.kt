@@ -19,12 +19,13 @@ import com.yourcompany.recipecomposeapp.ui.recipes.model.IngredientUiModel
 
 @Composable
 fun IngredientItem(
+    modifier: Modifier = Modifier,
     ingredient: IngredientUiModel,
     isFirst: Boolean,
     isLast: Boolean,
 ) {
     Surface(
-        modifier = Modifier.padding(horizontal = 16.dp),
+        modifier = modifier.padding(horizontal = 16.dp),
         shape = when {
             isFirst -> RoundedCornerShape(
                 topStart = 8.dp,
