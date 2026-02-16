@@ -1,11 +1,11 @@
 package com.yourcompany.recipecomposeapp.ui.details
 
-import androidx.compose.foundation.Image
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -23,12 +24,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -47,9 +52,10 @@ fun RecipeDetailsScreen(
     recipe: RecipeUiModel,
     modifier: Modifier = Modifier,
 ) {
-    var currentPortions by remember { mutableStateOf(recipe.servings) }
+    var currentPortions by rememberSaveable { mutableStateOf(recipe.servings) }
+    var isFavorite by rememberSaveable { mutableStateOf(false) }
 
-    val scaledIngredients = remember(currentPortions) {
+    val scaledIngredients = remember(recipe.ingredients, currentPortions) {
         val multiplier = currentPortions.toDouble() / recipe.servings
         recipe.ingredients.map { ingredient ->
             if (ingredient.unitOfMeasure.isEmpty()) {
@@ -73,8 +79,10 @@ fun RecipeDetailsScreen(
                 item {
                     RecipeHeader(
                         recipe = recipe,
-                        isFavorite = recipe.isFavorite,
-                        onToggleFavorite = {},
+                        isFavorite = isFavorite,
+                        onToggleFavorite = {
+                            isFavorite = !isFavorite
+                        },
                         onShareClick = {
                             shareRecipe(context, recipe.id, recipe.title)
                         }
@@ -194,29 +202,36 @@ fun RecipeHeader(
     onShareClick: () -> Unit,
 ) {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxWidth()
     ) {
         ScreenHeader(
             screenTitle = recipe.title,
             screenCover = ImageResource.ResourceUrl(recipe.imageUrl)
         )
-        Image(
+        Crossfade(
             modifier = Modifier
                 .padding(top = 16.dp, end = 16.dp)
                 .align(Alignment.TopEnd)
-                .clickable(
-                    true,
-                    onClick = onToggleFavorite
-                ),
-            painter = if (isFavorite) painterResource(R.drawable.ic_heart)
-            else painterResource(R.drawable.ic_heart_empty_btn),
-            contentDescription = null,
-        )
+                .clickable(onClick = onToggleFavorite),
+            targetState = isFavorite,
+            animationSpec = tween(durationMillis = 300),
+            label = "favorite_animation"
+        ) { isCurrentFavorite ->
+            val heartIcon = rememberVectorPainter(
+                image = ImageVector.vectorResource(
+                    id = if (isCurrentFavorite) R.drawable.ic_heart
+                    else R.drawable.ic_heart_empty_btn,
+                )
+            )
+            Icon(
+                painter = heartIcon,
+                tint = Color.Unspecified,
+                contentDescription = "Favorite"
+            )
+        }
         Text(
             modifier = Modifier
-                .clickable(
-                    onClick = onShareClick
-                )
+                .clickable(onClick = onShareClick)
                 .align(Alignment.TopStart)
                 .padding(start = 16.dp, top = 16.dp),
             text = "Поделиться",
