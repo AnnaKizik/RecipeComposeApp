@@ -1,7 +1,8 @@
-package com.yourcompany.recipecomposeapp
+package com.yourcompany.recipecomposeapp.util
 
 import android.content.Context
 import android.content.Intent
+import com.yourcompany.recipecomposeapp.Destination
 
 fun shareRecipe(context: Context, recipeId: Int, recipeTitle: String) {
     val shareLink = Destination.Recipe.createRecipeDeepLink(recipeId)

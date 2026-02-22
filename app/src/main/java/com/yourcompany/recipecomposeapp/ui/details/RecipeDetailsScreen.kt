@@ -22,6 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -41,7 +42,7 @@ import com.yourcompany.recipecomposeapp.R
 import com.yourcompany.recipecomposeapp.core.ui.ImageResource
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
 import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub
-import com.yourcompany.recipecomposeapp.shareRecipe
+import com.yourcompany.recipecomposeapp.util.shareRecipe
 import com.yourcompany.recipecomposeapp.ui.recipes.model.RecipeUiModel
 import com.yourcompany.recipecomposeapp.ui.recipes.model.toUiModel
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
@@ -50,10 +51,12 @@ import kotlin.math.roundToInt
 @Composable
 fun RecipeDetailsScreen(
     recipe: RecipeUiModel,
-    modifier: Modifier = Modifier,
+    isFavorite: Boolean,
+    onToggleFavorite: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    var currentPortions by rememberSaveable { mutableStateOf(recipe.servings) }
-    var isFavorite by rememberSaveable { mutableStateOf(false) }
+    var currentPortions by rememberSaveable { mutableIntStateOf(recipe.servings) }
+    var favoriteState by rememberSaveable { mutableStateOf(isFavorite) }
 
     val scaledIngredients = remember(recipe.ingredients, currentPortions) {
         val multiplier = currentPortions.toDouble() / recipe.servings
@@ -79,9 +82,10 @@ fun RecipeDetailsScreen(
                 item {
                     RecipeHeader(
                         recipe = recipe,
-                        isFavorite = isFavorite,
+                        isFavorite = favoriteState,
                         onToggleFavorite = {
-                            isFavorite = !isFavorite
+                            favoriteState = !favoriteState
+                            onToggleFavorite()
                         },
                         onShareClick = {
                             shareRecipe(context, recipe.id, recipe.title)
@@ -200,9 +204,10 @@ fun RecipeHeader(
     isFavorite: Boolean,
     onToggleFavorite: () -> Unit,
     onShareClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         ScreenHeader(
             screenTitle = recipe.title,
@@ -210,9 +215,9 @@ fun RecipeHeader(
         )
         Crossfade(
             modifier = Modifier
+                .clickable(onClick = onToggleFavorite)
                 .padding(top = 16.dp, end = 16.dp)
-                .align(Alignment.TopEnd)
-                .clickable(onClick = onToggleFavorite),
+                .align(Alignment.TopEnd),
             targetState = isFavorite,
             animationSpec = tween(durationMillis = 300),
             label = "favorite_animation"
@@ -243,8 +248,12 @@ fun RecipeHeader(
 
 @Preview(showBackground = true)
 @Composable
-fun RecipeDetailScreenPreview() {
+private fun RecipeDetailScreenPreview() {
     RecipeComposeAppTheme {
-        RecipeDetailsScreen(RecipesRepositoryStub.recipes[0].toUiModel())
+        RecipeDetailsScreen(
+            RecipesRepositoryStub.recipes[0].toUiModel(),
+            isFavorite = true,
+            onToggleFavorite = {}
+        )
     }
 }
