@@ -13,10 +13,12 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,6 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
+import com.yourcompany.recipecomposeapp.util.FavoriteDataStoreManager
 
 @Composable
 fun BottomNavigation(
@@ -38,6 +41,10 @@ fun BottomNavigation(
             .padding(horizontal = 16.dp),
         containerColor = Color.Transparent
     ) {
+        val context = LocalContext.current
+        val favoritesCount by FavoriteDataStoreManager(context = context).getFavoriteCountFlow()
+            .collectAsState(initial = 0)
+
         NavigationBarItem(
             selected = currentRoute == Destination.Categories.route,
             onClick = {
@@ -91,12 +98,22 @@ fun BottomNavigation(
                             color = MaterialTheme.colorScheme.surface,
                             style = MaterialTheme.typography.labelLarge
                         )
-                        Image(
-                            modifier = Modifier.padding(horizontal = 8.dp),
-                            painter = painterResource(R.drawable.ic_heart_empty),
-                            contentDescription = null,
-                            alignment = Alignment.CenterEnd
-                        )
+                        if (favoritesCount > 0) {
+                            Text(
+                                text = favoritesCount.toString().uppercase(),
+                                modifier = Modifier.padding(horizontal = 8.dp),
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.surface,
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                        } else {
+                            Image(
+                                modifier = Modifier.padding(horizontal = 8.dp),
+                                painter = painterResource(R.drawable.ic_heart_empty),
+                                contentDescription = null,
+                                alignment = Alignment.CenterEnd
+                            )
+                        }
                     }
                 }
             },
@@ -109,7 +126,7 @@ fun BottomNavigation(
 
 @Preview(showBackground = true)
 @Composable
-fun BottomNavigationPreview() {
+private fun BottomNavigationPreview() {
     RecipeComposeAppTheme {
         val navController = rememberNavController()
         BottomNavigation(navController = navController)
