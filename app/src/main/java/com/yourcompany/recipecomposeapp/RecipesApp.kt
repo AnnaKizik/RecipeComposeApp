@@ -6,7 +6,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -19,13 +18,11 @@ import com.yourcompany.recipecomposeapp.ui.details.RecipeDetailsScreen
 import com.yourcompany.recipecomposeapp.ui.favorites.FavoritesScreen
 import com.yourcompany.recipecomposeapp.ui.recipes.RecipesScreen
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
-import com.yourcompany.recipecomposeapp.util.FavoritePrefsManager
 import kotlinx.coroutines.delay
 
 @Composable
 fun RecipesApp(deepLinkIntent: Intent?) {
     val navController = rememberNavController()
-    val context = LocalContext.current
 
     LaunchedEffect(deepLinkIntent) {
         deepLinkIntent?.data?.let { uri ->
@@ -92,14 +89,8 @@ fun RecipesApp(deepLinkIntent: Intent?) {
                     val recipe = RecipesRepositoryStub.getRecipeDataByRecipeId(recipeId)
                     RecipeDetailsScreen(
                         recipe = recipe,
-                        isFavorite = FavoritePrefsManager(context).checkIsFavorite(recipeId),
-                        onToggleFavorite = {
-                            if (recipe.isFavorite) {
-                                FavoritePrefsManager(context).removeFromFavorite(recipe.id)
-                            } else {
-                                FavoritePrefsManager(context).addToFavorites(recipe.id)
-                            }
-                        },
+                        isFavorite = recipe.isFavorite,
+                        onToggleFavorite = {},
                     )
                 }
                 composable(

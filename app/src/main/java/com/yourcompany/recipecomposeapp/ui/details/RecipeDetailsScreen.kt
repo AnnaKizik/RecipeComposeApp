@@ -21,10 +21,12 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,6 +48,8 @@ import com.yourcompany.recipecomposeapp.util.shareRecipe
 import com.yourcompany.recipecomposeapp.ui.recipes.model.RecipeUiModel
 import com.yourcompany.recipecomposeapp.ui.recipes.model.toUiModel
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
+import com.yourcompany.recipecomposeapp.util.FavoriteDataStoreManager
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
@@ -57,6 +61,7 @@ fun RecipeDetailsScreen(
 ) {
     var currentPortions by rememberSaveable { mutableIntStateOf(recipe.servings) }
     var favoriteState by rememberSaveable { mutableStateOf(isFavorite) }
+    val coroutineScope = rememberCoroutineScope()
 
     val scaledIngredients = remember(recipe.ingredients, currentPortions) {
         val multiplier = currentPortions.toDouble() / recipe.servings
@@ -73,6 +78,10 @@ fun RecipeDetailsScreen(
 
     val context = LocalContext.current
 
+    LaunchedEffect(recipe.id) {
+        favoriteState = FavoriteDataStoreManager(context).isFavorite(recipe.id)
+    }
+
     Scaffold(
         modifier = modifier,
         content = { paddingValues ->
@@ -84,6 +93,13 @@ fun RecipeDetailsScreen(
                         recipe = recipe,
                         isFavorite = favoriteState,
                         onToggleFavorite = {
+                            coroutineScope.launch {
+                                if (favoriteState){
+                                    FavoriteDataStoreManager(context).removeFavorite(recipe.id)
+                                } else {
+                                    FavoriteDataStoreManager(context).addFavorite(recipe.id)
+                                }
+                            }
                             favoriteState = !favoriteState
                             onToggleFavorite()
                         },
