@@ -10,29 +10,42 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yourcompany.recipecomposeapp.R
 import com.yourcompany.recipecomposeapp.core.ui.ImageResource
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
+import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub
 import com.yourcompany.recipecomposeapp.ui.recipes.RecipeItem
-import com.yourcompany.recipecomposeapp.ui.recipes.model.RecipeUiModel
 import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
+import com.yourcompany.recipecomposeapp.util.FavoriteDataStoreManager
 
 @Composable
 fun FavoritesScreen(
     modifier: Modifier = Modifier,
-    isFavoritesListEmpty: Boolean = false,
+    recipesRepository: RecipesRepositoryStub = RecipesRepositoryStub,
     onRecipeClick: (Int) -> Unit,
 ) {
-    var recipes by remember { mutableStateOf<List<RecipeUiModel>>(emptyList()) }
+    val context = LocalContext.current
+    val favoriteDataStoreManager = remember { FavoriteDataStoreManager(context) }
+
+    val favoritesList by favoriteDataStoreManager
+        .getFavoriteIdsFlow()
+        .collectAsState(
+            initial = emptySet()
+        )
+    val favoriteRecipesList = favoritesList.mapNotNull { id ->
+        val recipeId = id.toIntOrNull()
+        if (recipeId != null) recipesRepository.getRecipeDataByRecipeId(recipeId)
+        else null
+    }
 
     Scaffold(
         modifier = modifier,
@@ -42,7 +55,7 @@ fun FavoritesScreen(
                     screenTitle = "ИЗБРАННОЕ",
                     screenCover = ImageResource.ResourceId(R.drawable.bcg_favorites)
                 )
-                if (isFavoritesListEmpty) {
+                if (favoriteRecipesList.isEmpty()) {
                     Box(
                         modifier = modifier
                             .fillMaxSize()
@@ -59,7 +72,7 @@ fun FavoritesScreen(
                     }
                 } else {
                     LazyColumn {
-                        items(recipes, key = { it.id }) { recipe ->
+                        items(favoriteRecipesList, key = { it.id }) { recipe ->
                             RecipeItem(
                                 recipe = recipe,
                                 onRecipeClick = onRecipeClick,
@@ -78,7 +91,9 @@ fun FavoritesScreen(
 @Composable
 fun FavoritesScreenPreview() {
     RecipeComposeAppTheme {
-        FavoritesScreen(isFavoritesListEmpty = false, onRecipeClick = {})
+        FavoritesScreen(
+            onRecipeClick = {}
+        )
     }
 }
 
@@ -86,6 +101,8 @@ fun FavoritesScreenPreview() {
 @Composable
 fun EmptyFavoritesScreenPreview() {
     RecipeComposeAppTheme {
-        FavoritesScreen(isFavoritesListEmpty = true, onRecipeClick = {})
+        FavoritesScreen(
+            onRecipeClick = {}
+        )
     }
 }

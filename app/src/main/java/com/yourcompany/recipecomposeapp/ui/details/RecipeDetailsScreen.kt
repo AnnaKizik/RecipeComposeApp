@@ -54,17 +54,16 @@ import kotlin.math.roundToInt
 @Composable
 fun RecipeDetailsScreen(
     recipe: RecipeUiModel,
-    isFavorite: Boolean,
     onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var currentPortions by rememberSaveable { mutableIntStateOf(recipe.servings) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-    val favoriteDataStoreManager = FavoriteDataStoreManager(context)
+    val favoriteDataStoreManager = remember { FavoriteDataStoreManager(context) }
     val isInFavorites by favoriteDataStoreManager
         .isFavoriteFlow(recipe.id)
-        .collectAsState(initial = isFavorite)
+        .collectAsState(initial = false)
 
     val scaledIngredients = remember(recipe.ingredients, currentPortions) {
         val multiplier = currentPortions.toDouble() / recipe.servings
@@ -264,7 +263,6 @@ private fun RecipeDetailScreenPreview() {
     RecipeComposeAppTheme {
         RecipeDetailsScreen(
             RecipesRepositoryStub.recipes[0].toUiModel(),
-            isFavorite = true,
             onToggleFavorite = {}
         )
     }
