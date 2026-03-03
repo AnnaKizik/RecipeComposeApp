@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.yourcompany.recipecomposeapp.R
-import com.yourcompany.recipecomposeapp.ui.theme.RecipeComposeAppTheme
+import com.yourcompany.recipecomposeapp.core.ui.theme.RecipeComposeAppTheme
 
 @Composable
 fun ScreenHeader(
