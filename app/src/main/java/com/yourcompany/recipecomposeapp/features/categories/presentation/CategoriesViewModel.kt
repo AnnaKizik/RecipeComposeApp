@@ -20,14 +20,15 @@ class CategoriesViewModel : ViewModel() {
         loadCategories()
     }
 
-    private fun loadCategories() {
+    fun loadCategories() {
         viewModelScope.launch {
             try {
-                _uiState.value = CategoriesUiState(
-                    categories = RecipesRepositoryStub.takeCategories().map { it.toUiModel() },
-                    isLoaded = true,
-                    error = null,
-                )
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        categories = RecipesRepositoryStub.takeCategories().map { it.toUiModel() },
+                        isLoaded = true,
+                    )
+                }
             } catch (e: Exception) {
                 _uiState.update { currentState ->
                     currentState.copy(

@@ -27,8 +27,8 @@ import com.yourcompany.recipecomposeapp.features.categories.presentation.model.C
 
 @Composable
 fun CategoriesScreen(
-    modifier: Modifier = Modifier,
-    onCategoryClick: (Int) -> Unit,
+    onCategoryClick: (Int, String, String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val viewModel: CategoriesViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
@@ -41,19 +41,19 @@ fun CategoriesScreen(
                     "КАТЕГОРИИ",
                     ImageResource.ResourceId(R.drawable.bcg_categories)
                 )
-                if (uiState.isLoaded) {
-                    CategoriesList(
-                        categoriesList = uiState.categories,
-                        onCategoryClick = { categoryId ->
-                            onCategoryClick(categoryId)
-                        }
-                    )
-                } else {
+                if (uiState.error != null) {
                     Text(
                         text = uiState.error ?: "Возникла ошибка при загрузке категорий",
                         color = MaterialTheme.colorScheme.secondary,
                         style = MaterialTheme.typography.labelLarge,
                         textAlign = TextAlign.Center,
+                    )
+                } else {
+                    CategoriesList(
+                        categoriesList = uiState.categories,
+                        onCategoryClick = { category ->
+                            onCategoryClick(category.id, category.title, category.imageUrl)
+                        }
                     )
                 }
             }
@@ -64,8 +64,8 @@ fun CategoriesScreen(
 @Composable
 fun CategoriesList(
     categoriesList: List<CategoryUiModel>,
-    modifier: Modifier = Modifier,
-    onCategoryClick: (Int) -> Unit,
+    onCategoryClick: (CategoryUiModel) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
         modifier = modifier
@@ -82,7 +82,7 @@ fun CategoriesList(
                 imageUrl = category.imageUrl,
                 title = category.title,
                 description = category.description,
-                onCategoryClick = { onCategoryClick(category.id) }
+                onCategoryClick = { onCategoryClick(category) }
             )
         }
     }
@@ -90,10 +90,10 @@ fun CategoriesList(
 
 @Preview(showBackground = true)
 @Composable
-fun CategoriesScreenPreview() {
+private fun CategoriesScreenPreview() {
     RecipeComposeAppTheme {
         CategoriesScreen(
-            onCategoryClick = { _: Int -> }
+            onCategoryClick = { _: Int, _: String, _: String -> }
         )
     }
 }
