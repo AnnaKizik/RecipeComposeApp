@@ -60,17 +60,31 @@ fun RecipesApp(deepLinkIntent: Intent?) {
                 composable(Destination.Categories.route) {
                     CategoriesScreen(
                         onCategoryClick = { categoryId, categoryTitle, categoryImgUrl ->
-                            navController.navigate(Destination.Recipes.createRoute(categoryId))
+                            navController.navigate(
+                                Destination.Recipes.createRoute(
+                                    categoryId,
+                                    categoryTitle,
+                                    categoryImgUrl
+                                )
+                            )
                         }
                     )
                 }
                 composable(
                     route = Destination.Recipes.route,
-                    arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
+                    arguments = listOf(
+                        navArgument("categoryId") { type = NavType.IntType },
+                        navArgument(
+                            "categoryTitle"
+                        ) { type = NavType.StringType },
+                        navArgument("categoryImageUrl") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: 0
+                    val categoryTitle: String =
+                        backStackEntry.arguments?.getString("categoryTitle") ?: ""
+                    val categoryImageUrl: String =
+                        backStackEntry.arguments?.getString("categoryImageUrl") ?: ""
                     RecipesScreen(
-                        categoryId = categoryId,
                         onRecipeClick = { recipeId, recipe ->
                             navController.currentBackStackEntry?.savedStateHandle?.set(
                                 Destination.Recipe.KEY_RECIPE_OBJECT,
