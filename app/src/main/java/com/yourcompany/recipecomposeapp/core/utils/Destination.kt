@@ -1,9 +1,12 @@
 package com.yourcompany.recipecomposeapp.core.utils
 
+import java.net.URLEncoder
+
 sealed class Destination(val route: String) {
     object Categories : Destination("categories")
-    object Recipes : Destination("recipes/{categoryId}") {
-        fun createRoute(categoryId: Int) = "recipes/${categoryId}"
+
+    object Recipes : Destination("recipes/{categoryId}/{categoryTitle}/{categoryImageUrl}") {
+        fun createRoute(categoryId: Int, categoryTitle: String, categoryImageUrl: String) = "recipes/${categoryId}/${categoryTitle}/${URLEncoder.encode(categoryImageUrl, "UTF-8")}"
     }
 
     object Recipe : Destination("recipe/{recipeId}") {
