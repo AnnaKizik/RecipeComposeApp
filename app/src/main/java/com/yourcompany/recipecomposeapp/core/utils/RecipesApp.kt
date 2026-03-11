@@ -59,7 +59,7 @@ fun RecipesApp(deepLinkIntent: Intent?) {
             ) {
                 composable(Destination.Categories.route) {
                     CategoriesScreen(
-                        onCategoryClick = { categoryId ->
+                        onCategoryClick = { categoryId, categoryTitle, categoryImgUrl ->
                             navController.navigate(Destination.Recipes.createRoute(categoryId))
                         }
                     )
