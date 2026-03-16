@@ -101,11 +101,7 @@ fun RecipesApp(deepLinkIntent: Intent?) {
                     })
                 ) { backStackEntry ->
                     val recipeId = backStackEntry.arguments?.getInt("recipeId") ?: 0
-                    val recipe = RecipesRepositoryStub.getRecipeDataByRecipeId(recipeId)
-                    RecipeDetailsScreen(
-                        recipe = recipe,
-                        onToggleFavorite = {},
-                    )
+                    RecipeDetailsScreen()
                 }
                 composable(
                     route = Destination.Favorites.route,
