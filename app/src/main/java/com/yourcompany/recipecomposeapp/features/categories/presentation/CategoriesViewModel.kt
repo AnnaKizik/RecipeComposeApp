@@ -26,7 +26,7 @@ class CategoriesViewModel : ViewModel() {
                 _uiState.update { currentState ->
                     currentState.copy(
                         categories = RecipesRepositoryStub.takeCategories().map { it.toUiModel() },
-                        isLoaded = true,
+                        isLoading = true,
                     )
                 }
             } catch (e: Exception) {
