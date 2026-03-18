@@ -10,12 +10,16 @@ import com.yourcompany.recipecomposeapp.features.details.presentation.model.Reci
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class RecipeDetailsViewModel(savedStateHandle: SavedStateHandle, application: Application) : AndroidViewModel(application) {
+class RecipeDetailsViewModel(
+    application: Application,
+    savedStateHandle: SavedStateHandle
+) :
+    AndroidViewModel(application) {
 
     private val favoriteManager = FavoriteDataStoreManager(application)
 
@@ -30,11 +34,8 @@ class RecipeDetailsViewModel(savedStateHandle: SavedStateHandle, application: Ap
     }
 
     private fun subscribeToFavorites() {
-        favoriteManager.getFavoriteIdsFlow().map { ids ->
-            val isFavorite = ids.contains(_uiState.value.id.toString())
-            _uiState.update { state ->
-                state.copy(isFavorite = isFavorite)
-            }
+        favoriteManager.getFavoriteIdsFlow().combine(_uiState) { ids, state ->
+            state.copy(isFavorite = ids.contains(state.id.toString()))
         }
             .launchIn(viewModelScope)
     }
@@ -69,6 +70,9 @@ class RecipeDetailsViewModel(savedStateHandle: SavedStateHandle, application: Ap
             val isFavorite = _uiState.value.isFavorite
             if (isFavorite) favoriteManager.removeFavorite(_uiState.value.id)
             else favoriteManager.addFavorite(_uiState.value.id)
+            _uiState.update { state ->
+                state.copy(isFavorite = favoriteManager.isFavorite(state.id))
+            }
         }
     }
 

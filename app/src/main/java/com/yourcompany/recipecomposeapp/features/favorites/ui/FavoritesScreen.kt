@@ -51,7 +51,13 @@ fun FavoritesScreen(
                     ) {
                         Text(
                             modifier = modifier,
-                            text = "Вы еще не добавили ни одного рецепта в избранное!",
+                            text = when {
+                                uiState.error != null -> uiState.error
+                                    ?: "Возникла ошибка при загрузке избранных рецептов"
+
+                                uiState.isLoading -> "Загрузка списка избранных рецептов..."
+                                else -> "Вы еще не добавили ни одного рецепта в избранное!"
+                            },
                             color = MaterialTheme.colorScheme.secondary,
                             style = MaterialTheme.typography.labelLarge,
                             textAlign = TextAlign.Center,
