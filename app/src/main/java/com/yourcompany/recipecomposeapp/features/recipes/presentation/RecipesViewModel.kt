@@ -30,7 +30,7 @@ class RecipesViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
                             .map { it.toUiModel() },
                         categoryTitle = categoryTitle,
                         categoryImgUrl = categoryImageUrl,
-                        isLoading = true,
+                        isLoading = false,
                         error = null,
                     )
                 }

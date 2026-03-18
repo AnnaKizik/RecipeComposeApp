@@ -43,24 +43,38 @@ fun RecipesScreen(
                         uiState.categoryImgUrl
                     )
                 )
-                if (uiState.error != null || uiState.recipesListEmpty)
-                    Text(
-                        text = uiState.error ?: "Возникла ошибка при загрузке рецептов",
-                        color = MaterialTheme.colorScheme.secondary,
-                        style = MaterialTheme.typography.labelLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                else
-                    LazyColumn {
-                        items(uiState.recipesList, key = { it.id }) { recipe ->
-                            RecipeItem(
-                                recipe = recipe,
-                                onRecipeClick = { onRecipeClick(recipe.id, recipe) },
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
+                when {
+                    uiState.error != null -> {
+                        Text(
+                            text = uiState.error ?: "Возникла ошибка при загрузке рецептов",
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.labelLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+
+                    uiState.recipesListEmpty -> {
+                        Text(
+                            text = "Список рецептов пуст!",
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.labelLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+
+                    else -> {
+                        LazyColumn {
+                            items(uiState.recipesList, key = { it.id }) { recipe ->
+                                RecipeItem(
+                                    recipe = recipe,
+                                    onRecipeClick = { onRecipeClick(recipe.id, recipe) },
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                                )
+                            }
                         }
                     }
+                }
             }
         }
     )

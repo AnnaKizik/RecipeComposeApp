@@ -23,11 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,44 +35,23 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yourcompany.recipecomposeapp.R
 import com.yourcompany.recipecomposeapp.core.ui.ImageResource
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
-import com.yourcompany.recipecomposeapp.data.repository.RecipesRepositoryStub
 import com.yourcompany.recipecomposeapp.core.utils.shareRecipe
-import com.yourcompany.recipecomposeapp.features.recipes.presentation.model.RecipeUiModel
-import com.yourcompany.recipecomposeapp.features.recipes.presentation.model.toUiModel
 import com.yourcompany.recipecomposeapp.core.ui.theme.RecipeComposeAppTheme
-import com.yourcompany.recipecomposeapp.core.utils.FavoriteDataStoreManager
-import kotlinx.coroutines.launch
+import com.yourcompany.recipecomposeapp.features.details.presentation.RecipeDetailsViewModel
 import kotlin.math.roundToInt
 
 @Composable
 fun RecipeDetailsScreen(
-    recipe: RecipeUiModel,
-    onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var currentPortions by rememberSaveable { mutableIntStateOf(recipe.servings) }
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val favoriteDataStoreManager = remember { FavoriteDataStoreManager(context) }
-    val isInFavorites by favoriteDataStoreManager
-        .isFavoriteFlow(recipe.id)
-        .collectAsState(initial = false)
+    val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
+    val uiState by recipeDetailsViewModel.uiState.collectAsState()
 
-    val scaledIngredients = remember(recipe.ingredients, currentPortions) {
-        val multiplier = currentPortions.toDouble() / recipe.servings
-        recipe.ingredients.map { ingredient ->
-            if (ingredient.unitOfMeasure.isEmpty()) {
-                ingredient.copy(quantity = ingredient.quantity)
-            } else {
-                ingredient.copy(
-                    quantity = (ingredient.quantity.toDouble() * multiplier).toString()
-                )
-            }
-        }
-    }
+    val context = LocalContext.current
 
     Scaffold(
         modifier = modifier,
@@ -86,28 +61,20 @@ fun RecipeDetailsScreen(
             ) {
                 item {
                     RecipeHeader(
-                        recipe = recipe,
-                        isFavorite = isInFavorites,
-                        onToggleFavorite = {
-                            coroutineScope.launch {
-                                if (isInFavorites) {
-                                    favoriteDataStoreManager.removeFavorite(recipe.id)
-                                } else {
-                                    favoriteDataStoreManager.addFavorite(recipe.id)
-                                }
-                            }
-                            onToggleFavorite()
-                        },
+                        recipeTitle = uiState.title,
+                        recipeCoverUrl = uiState.imageUrl,
+                        isFavorite = uiState.isFavorite,
+                        onToggleFavorite = { recipeDetailsViewModel.toggleFavorite() },
                         onShareClick = {
-                            shareRecipe(context, recipe.id, recipe.title)
-                        }
+                            shareRecipe(context, uiState.id, uiState.title)
+                        },
                     )
                 }
                 item {
                     PortionsSlider(
-                        currentPortions = currentPortions,
+                        currentPortions = uiState.portionsCount,
                         onPortionsChange = { newPortionsCount ->
-                            currentPortions = newPortionsCount
+                            recipeDetailsViewModel.updatePortions(newPortionsCount)
                         }
                     )
                 }
@@ -120,12 +87,12 @@ fun RecipeDetailsScreen(
                     )
                 }
                 items(
-                    items = scaledIngredients,
+                    items = uiState.scaledIngredients,
                     key = { it.name }) { ingredient ->
                     IngredientItem(
                         ingredient = ingredient,
-                        isFirst = ingredient == scaledIngredients.first(),
-                        isLast = ingredient == scaledIngredients.last()
+                        isFirst = ingredient == uiState.scaledIngredients.first(),
+                        isLast = ingredient == uiState.scaledIngredients.last()
                     )
                 }
                 item {
@@ -136,16 +103,16 @@ fun RecipeDetailsScreen(
                         style = MaterialTheme.typography.displayLarge
                     )
                 }
-                items(recipe.method) { step ->
+                items(uiState.method) { step ->
                     Surface(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         shape = when (step) {
-                            recipe.method.first() -> RoundedCornerShape(
+                            uiState.method.first() -> RoundedCornerShape(
                                 topStart = 8.dp,
                                 topEnd = 8.dp
                             )
 
-                            recipe.method.last() -> RoundedCornerShape(
+                            uiState.method.last() -> RoundedCornerShape(
                                 bottomStart = 8.dp,
                                 bottomEnd = 8.dp
                             )
@@ -164,7 +131,7 @@ fun RecipeDetailsScreen(
                                 color = MaterialTheme.colorScheme.onSecondary,
                                 style = MaterialTheme.typography.bodyMedium
                             )
-                            if (step != recipe.method.last()) {
+                            if (step != uiState.method.last()) {
                                 HorizontalDivider(
                                     modifier = Modifier
                                         .padding(
@@ -211,7 +178,8 @@ fun PortionsSlider(
 
 @Composable
 fun RecipeHeader(
-    recipe: RecipeUiModel,
+    recipeTitle: String,
+    recipeCoverUrl: String,
     isFavorite: Boolean,
     onToggleFavorite: () -> Unit,
     onShareClick: () -> Unit,
@@ -221,8 +189,8 @@ fun RecipeHeader(
         modifier = modifier.fillMaxWidth()
     ) {
         ScreenHeader(
-            screenTitle = recipe.title,
-            screenCover = ImageResource.ResourceUrl(recipe.imageUrl)
+            screenTitle = recipeTitle,
+            screenCover = ImageResource.ResourceUrl(recipeCoverUrl)
         )
         Crossfade(
             modifier = Modifier
@@ -261,9 +229,6 @@ fun RecipeHeader(
 @Composable
 private fun RecipeDetailScreenPreview() {
     RecipeComposeAppTheme {
-        RecipeDetailsScreen(
-            RecipesRepositoryStub.recipes[0].toUiModel(),
-            onToggleFavorite = {}
-        )
+        RecipeDetailsScreen()
     }
 }
