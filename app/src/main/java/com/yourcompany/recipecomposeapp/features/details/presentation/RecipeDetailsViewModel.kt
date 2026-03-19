@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -37,6 +38,7 @@ class RecipeDetailsViewModel(
         favoriteManager.getFavoriteIdsFlow().combine(_uiState) { ids, state ->
             state.copy(isFavorite = ids.contains(state.id.toString()))
         }
+            .onEach { _uiState.value = it }
             .launchIn(viewModelScope)
     }
 
