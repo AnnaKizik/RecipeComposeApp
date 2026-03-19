@@ -71,19 +71,29 @@ fun RecipeDetailsScreen(
                     )
                 }
                 item {
+                    Text(
+                        text = "Ингредиенты".uppercase(),
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .padding(top = 16.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.displayLarge
+                    )
+                }
+                item {
+                    Text(
+                        text = "Порции: ${uiState.portionsCount}",
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                        color = MaterialTheme.colorScheme.onSecondary,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                item {
                     PortionsSlider(
                         currentPortions = uiState.portionsCount,
                         onPortionsChange = { newPortionsCount ->
                             recipeDetailsViewModel.updatePortions(newPortionsCount)
                         }
-                    )
-                }
-                item {
-                    Text(
-                        text = "Ингредиенты".uppercase(),
-                        modifier = Modifier.padding(16.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.displayLarge
                     )
                 }
                 items(
