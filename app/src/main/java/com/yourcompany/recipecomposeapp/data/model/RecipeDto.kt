@@ -1,7 +1,11 @@
 package com.yourcompany.recipecomposeapp.data.model
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class RecipeDto(
-    val recipeId: Int,
+    @SerialName("id") val recipeId: Int,
     val categoryId: Int,
     val title: String,
     val ingredients: List<IngredientDto>,
