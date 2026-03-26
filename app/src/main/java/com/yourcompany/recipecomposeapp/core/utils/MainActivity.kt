@@ -17,8 +17,8 @@ import com.yourcompany.recipecomposeapp.core.ui.theme.RecipeComposeAppTheme
 import com.yourcompany.recipecomposeapp.data.model.CategoryDto
 import com.yourcompany.recipecomposeapp.data.model.RecipeDto
 import kotlinx.serialization.json.Json
-import java.net.HttpURLConnection
-import java.net.URL
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -26,6 +26,7 @@ class MainActivity : ComponentActivity() {
     private var deepLinkIntent by mutableStateOf<Intent?>(null)
 
     private val threadPool: ExecutorService = Executors.newFixedThreadPool(10)
+    private val okHttpClient = OkHttpClient()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,53 +34,45 @@ class MainActivity : ComponentActivity() {
         Log.i("pool", "Метод onCreate() выполняется на потоке: ${Thread.currentThread().name}")
 
         threadPool.execute {
-            val url = URL("https://recipes.androidsprint.ru/api/category")
-            val connection = url.openConnection() as HttpURLConnection
+
+            val request = Request.Builder()
+                .url("https://recipes.androidsprint.ru/api/category")
+                .build()
 
             try {
-                connection.connect()
+                okHttpClient.newCall(request).execute().use { response ->
+                    Log.i("pool", "Выполняю запрос на потоке: ${Thread.currentThread().name}")
+                    Log.i("!!!", "responseCode: ${response.code}")
+                    Log.i("!!!", "responseMessage: ${response.message}")
+                    val categories =
+                        Json.decodeFromString<List<CategoryDto>>(response.body.toString())
+                    Log.i("!!!", "Полученные категории: ${categories.map { it.title }}")
 
-                Log.i("pool", "Выполняю запрос на потоке: ${Thread.currentThread().name}")
+                    for (i in categories.map { it.id }) {
+                        threadPool.execute {
 
-                Log.i("!!!", "responseCode: ${connection.responseCode}")
-                Log.i("!!!", "responseMessage: ${connection.responseMessage}")
+                            val recipesRequest = Request.Builder()
+                                .url("https://recipes.androidsprint.ru/api/category/${i}/recipes")
+                                .build()
 
-                val responseBody = connection.inputStream.bufferedReader().use { it.readText() }
-                Log.i("!!!", "Body: $responseBody")
-
-                val data = Json.decodeFromString<List<CategoryDto>>(responseBody)
-                Log.i("!!!", "Количество категорий: ${data.size}")
-                Log.i("!!!", "Названия категорий: ${data.map { it.title }}")
-
-                threadPool.execute {
-                    for (i in data.map { it.id }) {
-                        val url = URL("https://recipes.androidsprint.ru/api/category/${i}/recipes")
-                        val connection = url.openConnection() as HttpURLConnection
-
-                        try {
-                            connection.connect()
-
-                            Log.i("pool", "Выполняю запрос на потоке: ${Thread.currentThread().name}")
-
-                            val recipesResponseBody =
-                                connection.inputStream.bufferedReader().use { it.readText() }
-                            Log.i("!!!", "Body: $recipesResponseBody")
-                            val recipesData =
-                                Json.decodeFromString<List<RecipeDto>>(recipesResponseBody)
-                            Log.i("!!!", "Количество рецептов: ${recipesData.size}")
-
-                        } catch (e: Exception) {
-                            throw IllegalThreadStateException("Ошибка при получении рецептов категории: $e")
-                        } finally {
-                            connection.disconnect()
+                            try {
+                                okHttpClient.newCall(recipesRequest).execute().use { response ->
+                                    Log.i(
+                                        "pool",
+                                        "Выполняю запрос на потоке: ${Thread.currentThread().name}"
+                                    )
+                                    val recipesData =
+                                        Json.decodeFromString<List<RecipeDto>>(response.body.toString())
+                                    Log.i("!!!", "Количество рецептов: ${recipesData.size}")
+                                }
+                            } catch (e: Exception) {
+                                Log.e("thread_error", "Ошибка при получении рецептов категории: $e")
+                            }
                         }
                     }
                 }
-
             } catch (e: Exception) {
-                throw IllegalThreadStateException("Ошибка при получении категорий: $e")
-            } finally {
-                connection.disconnect()
+                Log.e("thread_error", "Ошибка при получении категорий: $e")
             }
         }
 
