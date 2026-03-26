@@ -13,67 +13,39 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.yourcompany.recipecomposeapp.core.network.NetworkConfig
+import com.yourcompany.recipecomposeapp.core.network.api.RecipesApiService
 import com.yourcompany.recipecomposeapp.core.ui.theme.RecipeComposeAppTheme
-import com.yourcompany.recipecomposeapp.data.model.CategoryDto
-import com.yourcompany.recipecomposeapp.data.model.RecipeDto
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import okhttp3.MediaType.Companion.toMediaType
+import retrofit2.Retrofit
 
 class MainActivity : ComponentActivity() {
     private var deepLinkIntent by mutableStateOf<Intent?>(null)
 
-    private val threadPool: ExecutorService = Executors.newFixedThreadPool(10)
-    private val okHttpClient = OkHttpClient()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.i("pool", "Метод onCreate() выполняется на потоке: ${Thread.currentThread().name}")
+        val contentType = "application/json".toMediaType()
+        val json = Json { ignoreUnknownKeys = true }
 
-        threadPool.execute {
-
-            val request = Request.Builder()
-                .url("https://recipes.androidsprint.ru/api/category")
+        lifecycleScope.launch {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(NetworkConfig.BASE_URL)
+                .addConverterFactory(json.asConverterFactory(contentType))
                 .build()
 
-            try {
-                okHttpClient.newCall(request).execute().use { response ->
-                    Log.i("pool", "Выполняю запрос на потоке: ${Thread.currentThread().name}")
-                    Log.i("!!!", "responseCode: ${response.code}")
-                    Log.i("!!!", "responseMessage: ${response.message}")
-                    val categories =
-                        Json.decodeFromString<List<CategoryDto>>(response.body.toString())
-                    Log.i("!!!", "Полученные категории: ${categories.map { it.title }}")
+            val service = retrofit.create(RecipesApiService::class.java)
 
-                    for (i in categories.map { it.id }) {
-                        threadPool.execute {
+            val categories = service.getCategories()
+            Log.i("!!!", "Загруженные категории: ${categories.map { it.title }}")
 
-                            val recipesRequest = Request.Builder()
-                                .url("https://recipes.androidsprint.ru/api/category/${i}/recipes")
-                                .build()
+            val recipes = categories.map { service.getRecipesByCategory(it.id) }
+            Log.i("!!!", "Загружено рецептов: ${recipes.map { it.map { it.title }}}")
 
-                            try {
-                                okHttpClient.newCall(recipesRequest).execute().use { response ->
-                                    Log.i(
-                                        "pool",
-                                        "Выполняю запрос на потоке: ${Thread.currentThread().name}"
-                                    )
-                                    val recipesData =
-                                        Json.decodeFromString<List<RecipeDto>>(response.body.toString())
-                                    Log.i("!!!", "Количество рецептов: ${recipesData.size}")
-                                }
-                            } catch (e: Exception) {
-                                Log.e("thread_error", "Ошибка при получении рецептов категории: $e")
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("thread_error", "Ошибка при получении категорий: $e")
-            }
         }
 
         intent?.data?.let { _ ->
@@ -96,7 +68,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        threadPool.shutdown()
     }
 }
 
