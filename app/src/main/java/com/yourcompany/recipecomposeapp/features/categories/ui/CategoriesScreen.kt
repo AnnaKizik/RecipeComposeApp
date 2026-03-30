@@ -13,24 +13,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yourcompany.recipecomposeapp.R
 import com.yourcompany.recipecomposeapp.core.ui.ImageResource
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
-import com.yourcompany.recipecomposeapp.core.ui.theme.RecipeComposeAppTheme
+import com.yourcompany.recipecomposeapp.data.repository.RecipesRepository
 import com.yourcompany.recipecomposeapp.features.categories.presentation.CategoriesViewModel
 import com.yourcompany.recipecomposeapp.features.categories.presentation.model.CategoryUiModel
 
 @Composable
 fun CategoriesScreen(
     onCategoryClick: (Int, String, String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    repository: RecipesRepository
 ) {
-    val viewModel: CategoriesViewModel = viewModel()
+    val viewModel: CategoriesViewModel = remember { CategoriesViewModel(repository) }
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
@@ -88,12 +88,12 @@ fun CategoriesList(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun CategoriesScreenPreview() {
-    RecipeComposeAppTheme {
-        CategoriesScreen(
-            onCategoryClick = { _: Int, _: String, _: String -> }
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun CategoriesScreenPreview() {
+//    RecipeComposeAppTheme {
+//        CategoriesScreen(
+//            onCategoryClick = { _: Int, _: String, _: String -> }
+//        )
+//    }
+//}
