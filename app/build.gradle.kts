@@ -46,7 +46,9 @@ android {
 }
 
 dependencies {
-    implementation(libs.okhttp)
+    implementation(libs.retrofit.v300)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation(platform(libs.okhttp.bom.v530))
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
