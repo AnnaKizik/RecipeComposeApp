@@ -31,21 +31,26 @@ class MainActivity : ComponentActivity() {
 
         val contentType = "application/json".toMediaType()
         val json = Json { ignoreUnknownKeys = true }
+        val retrofit = Retrofit.Builder()
 
         lifecycleScope.launch {
-            val retrofit = Retrofit.Builder()
+            val build = retrofit
                 .baseUrl(NetworkConfig.BASE_URL)
                 .addConverterFactory(json.asConverterFactory(contentType))
                 .build()
 
-            val service = retrofit.create(RecipesApiService::class.java)
+            val service = build.create(RecipesApiService::class.java)
 
-            val categories = service.getCategories()
-            Log.i("!!!", "Загруженные категории: ${categories.map { it.title }}")
+            try {
+                val categories = service.getCategories()
+                Log.i("!!!", "Загруженные категории: ${categories.map { it.title }}")
 
-            val recipes = categories.map { service.getRecipesByCategory(it.id) }
-            Log.i("!!!", "Загружено рецептов: ${recipes.map { it.map { it.title }}}")
+                val recipes = categories.map { service.getRecipesByCategory(it.id) }
+                Log.i("!!!", "Загружено рецептов: ${recipes.map { it.map { it.title } }}")
 
+            } catch (e: Exception) {
+                Log.e("network_error", "Ошибка загрузки по сети: $e")
+            }
         }
 
         intent?.data?.let { _ ->
