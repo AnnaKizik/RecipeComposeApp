@@ -32,25 +32,21 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yourcompany.recipecomposeapp.R
 import com.yourcompany.recipecomposeapp.core.ui.ImageResource
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
 import com.yourcompany.recipecomposeapp.core.utils.shareRecipe
-import com.yourcompany.recipecomposeapp.core.ui.theme.RecipeComposeAppTheme
 import com.yourcompany.recipecomposeapp.features.details.presentation.RecipeDetailsViewModel
 import kotlin.math.roundToInt
 
 @Composable
 fun RecipeDetailsScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: RecipeDetailsViewModel,
 ) {
-    val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
-    val uiState by recipeDetailsViewModel.uiState.collectAsState()
-
+    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
     Scaffold(
@@ -64,7 +60,7 @@ fun RecipeDetailsScreen(
                         recipeTitle = uiState.title,
                         recipeCoverUrl = uiState.imageUrl,
                         isFavorite = uiState.isFavorite,
-                        onToggleFavorite = { recipeDetailsViewModel.toggleFavorite() },
+                        onToggleFavorite = { viewModel.toggleFavorite() },
                         onShareClick = {
                             shareRecipe(context, uiState.id, uiState.title)
                         },
@@ -92,7 +88,7 @@ fun RecipeDetailsScreen(
                     PortionsSlider(
                         currentPortions = uiState.portionsCount,
                         onPortionsChange = { newPortionsCount ->
-                            recipeDetailsViewModel.updatePortions(newPortionsCount)
+                            viewModel.updatePortions(newPortionsCount)
                         }
                     )
                 }
@@ -235,10 +231,10 @@ fun RecipeHeader(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun RecipeDetailScreenPreview() {
-    RecipeComposeAppTheme {
-        RecipeDetailsScreen()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun RecipeDetailScreenPreview() {
+//    RecipeComposeAppTheme {
+//        RecipeDetailsScreen()
+//    }
+//}

@@ -12,23 +12,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yourcompany.recipecomposeapp.R
 import com.yourcompany.recipecomposeapp.core.ui.ImageResource
 import com.yourcompany.recipecomposeapp.core.ui.ScreenHeader
 import com.yourcompany.recipecomposeapp.features.recipes.presentation.model.RecipeUiModel
-import com.yourcompany.recipecomposeapp.core.ui.theme.RecipeComposeAppTheme
 import com.yourcompany.recipecomposeapp.features.recipes.presentation.RecipesViewModel
 
 @Composable
 fun RecipesScreen(
     modifier: Modifier = Modifier,
     onRecipeClick: (Int, RecipeUiModel) -> Unit,
+    viewModel: RecipesViewModel
 ) {
-    val recipesViewModel: RecipesViewModel = viewModel()
-    val uiState by recipesViewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         modifier = modifier,
@@ -80,12 +77,12 @@ fun RecipesScreen(
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun RecipesScreenPreview() {
-    RecipeComposeAppTheme {
-        RecipesScreen(
-            onRecipeClick = { _, _ -> },
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun RecipesScreenPreview() {
+//    RecipeComposeAppTheme {
+//        RecipesScreen(
+//            onRecipeClick = { _, _ -> },
+//        )
+//    }
+//}
