@@ -2,6 +2,7 @@ package com.yourcompany.recipecomposeapp.core.utils
 
 import android.app.Application
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -30,22 +31,43 @@ import com.yourcompany.recipecomposeapp.features.recipes.presentation.RecipesVie
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun RecipesApp(deepLinkIntent: Intent?) {
     val navController = rememberNavController()
     val context = LocalContext.current
-    val contentType = "application/json".toMediaType()
-    val json = Json { ignoreUnknownKeys = true }
-    val retrofit = Retrofit.Builder()
-        .baseUrl(NetworkConfig.BASE_URL)
-        .addConverterFactory(json.asConverterFactory(contentType))
-        .build()
-    val service = retrofit.create(RecipesApiService::class.java)
 
-    val repository = remember(service) {
-        RecipesRepositoryImpl(service) // Передаем apiService в конструктор
+    val isDebug = context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
+
+    val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = if (isDebug) {
+            HttpLoggingInterceptor.Level.BODY
+        } else {
+            HttpLoggingInterceptor.Level.NONE
+        }
+    }
+
+    val okHttpClient = OkHttpClient.Builder()
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .addInterceptor(loggingInterceptor)
+        .build()
+
+    val repository = remember {
+        val contentType = "application/json".toMediaType()
+        val json = Json { ignoreUnknownKeys = true }
+        val retrofit = Retrofit.Builder()
+            .baseUrl(NetworkConfig.BASE_URL)
+            .addConverterFactory(json.asConverterFactory(contentType))
+            .client(okHttpClient)
+            .build()
+        val service = retrofit.create(RecipesApiService::class.java)
+        RecipesRepositoryImpl(service)
     }
 
     LaunchedEffect(deepLinkIntent) {

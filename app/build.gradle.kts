@@ -23,8 +23,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            isDebuggable = true
+        }
         release {
-            isMinifyEnabled = false
+            isDebuggable = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -42,10 +46,12 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
 dependencies {
+    implementation(libs.logging.interceptor)
     implementation(libs.retrofit.v300)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(platform(libs.okhttp.bom.v530))
