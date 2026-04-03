@@ -2,7 +2,6 @@ package com.yourcompany.recipecomposeapp.core.utils
 
 import android.app.Application
 import android.content.Intent
-import android.content.pm.ApplicationInfo
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -41,24 +40,23 @@ fun RecipesApp(deepLinkIntent: Intent?) {
     val navController = rememberNavController()
     val context = LocalContext.current
 
-    val isDebug = context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
-
-    val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = if (isDebug) {
-            HttpLoggingInterceptor.Level.BODY
-        } else {
-            HttpLoggingInterceptor.Level.NONE
-        }
-    }
-
-    val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
-        .addInterceptor(loggingInterceptor)
-        .build()
-
     val repository = remember {
+
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = if (BuildConfug.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
+        }
+
+        val okHttpClient = OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .addInterceptor(loggingInterceptor)
+            .build()
+
         val contentType = "application/json".toMediaType()
         val json = Json { ignoreUnknownKeys = true }
         val retrofit = Retrofit.Builder()
