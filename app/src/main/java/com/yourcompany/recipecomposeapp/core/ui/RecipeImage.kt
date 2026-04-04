@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -25,13 +26,14 @@ fun RecipeImage(
 ) {
     AsyncImage(
         modifier = modifier,
-        model = ImageRequest.Builder(
-            context = LocalContext.current
-        )
-            .data(imageUrl)
-            .crossfade(true)
-            .crossfade(300)
-            .build(),
+        model = remember {
+            ImageRequest.Builder(
+                context = LocalContext.current
+            )
+                .data(imageUrl)
+                .crossfade(300)
+                .build()
+        },
         contentScale = contentScale,
         placeholder = painterResource(R.drawable.img_placeholder),
         error = painterResource(R.drawable.img_error),
@@ -41,7 +43,7 @@ fun RecipeImage(
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(
-                    modifier = modifier.size(40.dp),
+                    modifier = Modifier.size(40.dp),
                     color = MaterialTheme.colorScheme.primary
                 )
             }

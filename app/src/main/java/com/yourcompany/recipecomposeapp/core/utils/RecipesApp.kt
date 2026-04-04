@@ -43,7 +43,7 @@ fun RecipesApp(deepLinkIntent: Intent?) {
     val repository = remember {
 
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = if (BuildConfug.DEBUG) {
+            level = if (BuildConfig.DEBUG) {
                 HttpLoggingInterceptor.Level.BODY
             } else {
                 HttpLoggingInterceptor.Level.NONE
