@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.yourcompany.recipecomposeapp.BuildConfig
 import com.yourcompany.recipecomposeapp.core.network.NetworkConfig
 import com.yourcompany.recipecomposeapp.core.network.api.RecipesApiService
 import com.yourcompany.recipecomposeapp.core.ui.BottomNavigation

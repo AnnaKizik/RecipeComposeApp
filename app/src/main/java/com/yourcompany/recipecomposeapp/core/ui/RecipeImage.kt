@@ -26,7 +26,7 @@ fun RecipeImage(
 ) {
     AsyncImage(
         modifier = modifier,
-        model = remember {
+        model = remember(imageUrl) {
             ImageRequest.Builder(
                 context = LocalContext.current
             )
