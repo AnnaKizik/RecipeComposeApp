@@ -10,11 +10,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import com.yourcompany.recipecomposeapp.R
+import com.yourcompany.recipecomposeapp.core.ui.RecipeImage
 import com.yourcompany.recipecomposeapp.core.ui.theme.RecipeComposeAppTheme
 
 @Composable
@@ -32,15 +30,12 @@ fun CategoryItem(
         Column(
             modifier = modifier.background(color = MaterialTheme.colorScheme.surface)
         ) {
-            AsyncImage(
-                modifier = Modifier.height(130.dp),
-                model = imageUrl,
-                placeholder = painterResource(R.drawable.img_placeholder),
-                error = painterResource(R.drawable.img_error),
-                contentScale = ContentScale.Crop,
+            RecipeImage(
+                imageUrl = imageUrl,
                 contentDescription = "Изображение категории",
-
-                )
+                modifier = Modifier.height(130.dp),
+                contentScale = ContentScale.Crop
+            )
             Text(
                 text = title.uppercase(),
                 modifier = Modifier.padding(8.dp),
