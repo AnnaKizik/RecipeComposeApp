@@ -18,7 +18,7 @@ navigationCompose = "2.9.7"
 okhttpBomVersion = "5.3.0"
 retrofit2KotlinxSerializationConverter = "1.0.0"
 roomCompiler = "2.8.4"
-roomKtx = " 2.8.4"
+roomKtx = "2.8.4"
 squareupRetrofit = "3.0.0"
 
 [libraries]
