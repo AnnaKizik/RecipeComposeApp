@@ -6,7 +6,8 @@ class Converters {
 
     @TypeConverter
     fun fromString(value: String): List<String> {
-        return value.split("|||")
+        return if (value.isEmpty()) emptyList()
+        else value.split("|||")
     }
 
     @TypeConverter

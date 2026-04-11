@@ -11,6 +11,7 @@ import com.yourcompany.recipecomposeapp.data.database.dao.RecipeDao
 import com.yourcompany.recipecomposeapp.data.database.entity.CategoryEntity
 import com.yourcompany.recipecomposeapp.data.database.entity.RecipeEntity
 
+@TypeConverters(Converters::class)
 @Database(
     entities = [
         CategoryEntity::class,
@@ -19,8 +20,6 @@ import com.yourcompany.recipecomposeapp.data.database.entity.RecipeEntity
     version = 2,
     exportSchema = false
 )
-
-@TypeConverters(Converters::class)
 abstract class RecipesDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun recipeDao(): RecipeDao
